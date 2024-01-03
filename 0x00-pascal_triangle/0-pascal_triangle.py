@@ -9,26 +9,32 @@
     Returns:
     - A list of lists of integers representing Pascal's Triangle.
     """
+def generate_pascals_triangle(n):
+    """
+    Generate Pascal's Triangle up to the nth row and return it as a list of lists of integers.
 
-def pascal_triangle(n):
-    '''
-    creates a list of lists of integers representing the
-    Pascal's triangle of a given integer and prints it
-    '''
-    pt = []
-    if type(n) is not int or n <= 0:
-        return pt
+    Args:
+    - n: An integer representing the number of rows in Pascal's Triangle.
 
-    for x in range(n):
-        ct = []
-        for y in range(x+1):
-            if y == 0 or y == x:
-                ct.append(1)
+    Returns:
+    - A list of lists of integers representing Pascal's Triangle.
+    """
+    pascals_triangle = []
+
+    if n <= 0:
+        return pascals_triangle
+
+    for row_index in range(n):
+        current_row = []
+
+        for element_index in range(row_index + 1):
+            if element_index == 0 or element_index == row_index:
+                current_row.append(1)
             else:
-                ct.append(pt[x-1][y] + pt[x-1][y-1])
-        pt.append(ct)
+                previous_row = pascals_triangle[row_index - 1]
+                current_element = previous_row[element_index - 1] + previous_row[element_index]
+                current_row.append(current_element)
 
-        # Print the current row
-        print("[{}]".format(",".join(map(str, ct)))
+        pascals_triangle.append(current_row)
 
-    return pt
+    return pascals_triangle

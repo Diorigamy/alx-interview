@@ -1,4 +1,5 @@
-def pascal_triangle(n):
+#!/usr/bin/python3
+
     """
     Generate Pascal's Triangle up to the nth row and print it.
 
@@ -8,6 +9,7 @@ def pascal_triangle(n):
     Returns:
     - A list of lists of integers representing Pascal's Triangle.
     """
+def pascal_triangle(n):
     if n <= 0:
         return []
 

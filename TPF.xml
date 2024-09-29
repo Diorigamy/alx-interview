@@ -1,0 +1,176 @@
+<xml xmlns="http://www.w3.org/1999/xhtml" is_dbot="true">
+  <variables>
+    <variable id="target_profit">10</variable>
+    <variable id="stop_loss">999</variable>
+    <variable id="initial_stake">5</variable>
+    <variable id="martingale_factor">2.05</variable>
+    <variable id="max_martingale_levels">4</variable>
+    <variable id="signal">none</variable>
+    <variable id="current_stake">5</variable>
+    <variable id="martingale_level">0</variable>
+  </variables>
+  
+  <block type="trade_definition">
+    <statement name="TRADE_OPTIONS">
+      <block type="trade_definition_market">
+        <field name="MARKET_LIST">synthetic_index</field>
+        <field name="SYMBOL_LIST">R_100</field>
+        <next>
+          <block type="trade_definition_candleinterval">
+            <field name="CANDLEINTERVAL_LIST">60</field>
+            <next>
+              <block type="controls_if">
+                <value name="IF0">
+                  <block type="logic_compare">
+                    <field name="OP">EQ</field>
+                    <value name="A">
+                      <block type="variables_get">
+                        <field name="VAR" id="signal"></field>
+                      </block>
+                    </value>
+                    <value name="B">
+                      <block type="text">
+                        <field name="TEXT">CALL</field>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+                <statement name="DO0">
+                  <block type="purchase">
+                    <field name="PURCHASE_LIST">CALL</field>
+                    <field name="AMOUNT">current_stake</field>
+                  </block>
+                </statement>
+                <next>
+                  <block type="controls_if">
+                    <value name="IF0">
+                      <block type="logic_compare">
+                        <field name="OP">EQ</field>
+                        <value name="A">
+                          <block type="variables_get">
+                            <field name="VAR" id="signal"></field>
+                          </block>
+                        </value>
+                        <value name="B">
+                          <block type="text">
+                            <field name="TEXT">PUT</field>
+                          </block>
+                        </value>
+                      </block>
+                    </value>
+                    <statement name="DO1">
+                      <block type="purchase">
+                        <field name="PURCHASE_LIST">PUT</field>
+                        <field name="AMOUNT">current_stake</field>
+                      </block>
+                    </statement>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+
+  <block type="after_purchase">
+    <statement name="AFTERPURCHASE_STACK">
+      <block type="controls_if">
+        <value name="IF0">
+          <block type="contract_check_result">
+            <field name="CHECK_RESULT">win</field>
+          </block>
+        </value>
+        <statement name="DO0">
+          <block type="variables_set">
+            <field name="VAR" id="current_stake"></field>
+            <value name="VALUE">
+              <block type="variables_get">
+                <field name="VAR" id="initial_stake"></field>
+              </block>
+            </value>
+          </block>
+          <next>
+            <block type="variables_set">
+              <field name="VAR" id="martingale_level"></field>
+              <value name="VALUE">
+                <block type="math_number">
+                  <field name="NUM">0</field>
+                </block>
+              </value>
+            </block>
+          </next>
+        </statement>
+        <next>
+          <block type="controls_if">
+            <value name="IF0">
+              <block type="contract_check_result">
+                <field name="CHECK_RESULT">loss</field>
+              </block>
+            </value>
+            <statement name="DO1">
+              <block type="variables_change">
+                <field name="VAR" id="martingale_level"></field>
+                <value name="DELTA">
+                  <block type="math_number">
+                    <field name="NUM">1</field>
+                  </block>
+                </value>
+              </block>
+              <next>
+                <block type="variables_set">
+                  <field name="VAR" id="current_stake"></field>
+                  <value name="VALUE">
+                    <block type="math_arithmetic">
+                      <field name="OP">MULTIPLY</field>
+                      <value name="A">
+                        <block type="variables_get">
+                          <field name="VAR" id="current_stake"></field>
+                        </block>
+                      </value>
+                      <value name="B">
+                        <block type="variables_get">
+                          <field name="VAR" id="martingale_factor"></field>
+                        </block>
+                      </value>
+                    </block>
+                  </value>
+                </block>
+                <next>
+                  <block type="controls_if">
+                    <value name="IF0">
+                      <block type="logic_compare">
+                        <field name="OP">GT</field>
+                        <value name="A">
+                          <block type="variables_get">
+                            <field name="VAR" id="martingale_level"></field>
+                          </block>
+                        </value>
+                        <value name="B">
+                          <block type="math_number">
+                            <field name="NUM">max_martingale_levels</field>
+                          </block>
+                        </value>
+                      </block>
+                    </value>
+                    <statement name="DO0">
+                      <block type="variables_set">
+                        <field name="VAR" id="current_stake"></field>
+                        <value name="VALUE">
+                          <block type="variables_get">
+                            <field name="VAR" id="initial_stake"></field>
+                          </block>
+                        </value>
+                      </block>
+                    </statement>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </statement>
+      </block>
+    </statement>
+  </block>
+</xml>
